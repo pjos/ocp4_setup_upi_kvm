@@ -104,7 +104,7 @@ if [ "$EXPOSE_METHOD" == "firewalld" ]; then
 
     # Checking if we have existing port forwarding
     echo -n "====> Checking if we have existing port forwarding: "
-    EXIS_FWD=$(firewall-cmd --list-forward-ports | grep "^port=80:proto=tcp:\|^port=443:proto=tcp:\|^port=6443:proto=tcp:") || true
+    EXIS_FWD=$(firewall-cmd --list-forward-ports | grep "^port=80:proto=tcp:\|^port=443:proto=tcp:\|^port=32480:proto=tcp:\|^port=32443:proto=tcp:\|^port=6443:proto=tcp:") || true
     test -z "$EXIS_FWD" || \
         {
             echo "Error"
@@ -133,6 +133,8 @@ if [ "$EXPOSE_METHOD" == "firewalld" ]; then
     echo "firewall-cmd --add-forward-port=port=443:proto=tcp:toaddr=${LBIP}:toport=443"
     echo "firewall-cmd --add-forward-port=port=6443:proto=tcp:toaddr=${LBIP}:toport=6443"
     echo "firewall-cmd --add-forward-port=port=80:proto=tcp:toaddr=${LBIP}:toport=80"
+    echo "firewall-cmd --add-forward-port=port=32443:proto=tcp:toaddr=${LBIP}:toport=32443"
+    echo "firewall-cmd --add-forward-port=port=32480:proto=tcp:toaddr=${LBIP}:toport=32480"
     echo "firewall-cmd --direct --passthrough ipv4 -I FORWARD -i ${VIR_INT} -j ACCEPT"
     echo "firewall-cmd --direct --passthrough ipv4 -I FORWARD -o ${VIR_INT} -j ACCEPT"
     echo 
@@ -145,6 +147,12 @@ if [ "$EXPOSE_METHOD" == "firewalld" ]; then
     firewall-cmd --add-forward-port=port=6443:proto=tcp:toaddr=${LBIP}:toport=6443 || echo "Failed"
 
     echo -n "====> Adding forward-port rule port=80:proto=tcp:toaddr=${LBIP}:toport=80: "
+    firewall-cmd --add-forward-port=port=80:proto=tcp:toaddr=${LBIP}:toport=80 || echo "Failed"
+
+    echo -n "====> Adding forward-port rule port=32443:proto=tcp:toaddr=${LBIP}:toport=32443: "
+    firewall-cmd --add-forward-port=port=443:proto=tcp:toaddr=${LBIP}:toport=443 || echo "Failed"
+
+    echo -n "====> Adding forward-port rule port=32480:proto=tcp:toaddr=${LBIP}:toport=32480: "
     firewall-cmd --add-forward-port=port=80:proto=tcp:toaddr=${LBIP}:toport=80 || echo "Failed"
 
     echo -n "====> Adding passthrough forwarding -I FORWARD -i ${VIR_INT}: "
@@ -204,6 +212,18 @@ cat <<EOF > ${HAPROXY_CFG}
         mode http
         option httplog
         use_backend ${CLUSTER_NAME}-http   if { hdr(host) -m end apps.${CLUSTER_NAME}.${BASE_DOM} }
+    frontend fe-shard-https
+        bind *:32443
+        mode tcp
+        option tcplog
+        tcp-request inspect-delay 10s
+        tcp-request content accept if { req_ssl_hello_type 1 }
+        use_backend ${CLUSTER_NAME}-shard-https   if { req.ssl_sni -m end apps.shard.${BASE_DOM} }
+    frontend fe-shard-http
+        bind *:32480
+        mode http
+        option httplog
+        use_backend ${CLUSTER_NAME}-shard-http   if { hdr(host) -m end apps.shard.${BASE_DOM} }
     
     backend ${CLUSTER_NAME}-api
         balance source
@@ -219,6 +239,15 @@ cat <<EOF > ${HAPROXY_CFG}
         balance source
         mode http
         server main lb.${CLUSTER_NAME}.${BASE_DOM}:80
+    backend ${CLUSTER_NAME}-shard-https
+        balance source
+        mode tcp
+        option ssl-hello-chk
+        server main lb.${CLUSTER_NAME}.${BASE_DOM}:32443
+    backend ${CLUSTER_NAME}-shard-http
+        balance source
+        mode http
+        server main lb.${CLUSTER_NAME}.${BASE_DOM}:32480
 EOF
 
     echo
@@ -244,6 +273,7 @@ EOF
     echo "# If SELinux is in Enforcing mode, you need to tell it to treat port 6443 as a webport, e.g:"
     echo
     echo "      semanage port -a -t http_port_t -p tcp 6443"
+    echo "      setsebool -P haproxy_connect_any 1"
     echo
     echo
 
