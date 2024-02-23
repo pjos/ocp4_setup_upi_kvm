@@ -124,6 +124,8 @@ done
 
 echo -n '====> Adding wild-card (*.apps) dns record in dnsmasq: '
 echo "address=/apps.${CLUSTER_NAME}.${BASE_DOM}/${LBIP}" >> ${DNS_DIR}/${CLUSTER_NAME}.conf || err "failed"; ok
+echo -n '====> Adding wild-card (*.apps) dns record in dnsmasq: '
+echo "address=/apps.shard.${BASE_DOM}/${LBIP}" >> ${DNS_DIR}/${CLUSTER_NAME}.conf || err "failed"; ok
 
 echo -n "====> Resstarting libvirt and dnsmasq: "
 systemctl restart libvirtd || err "systemctl restart libvirtd failed"
