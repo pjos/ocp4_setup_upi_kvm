@@ -16,7 +16,7 @@ export RHCOS_VERSION=""
 export N_MAST="3"
 
 # -w, --workers N
-export N_WORK="2"
+export N_WORK="3"
 
 # --master-cpu N(vCPU)
 export MAS_CPU="4"
@@ -25,10 +25,10 @@ export MAS_CPU="4"
 export MAS_MEM="16000"
 
 # --worker-cpu N(vCPU)
-export WOR_CPU="2"
+export WOR_CPU="8"
 
 # --worker-mem SIZE(MB)
-export WOR_MEM="8000"
+export WOR_MEM="16000"
 
 # --bootstrap-cpu N(vCPU)
 export BTS_CPU="4"
@@ -49,7 +49,7 @@ export DEF_LIBVIRT_NET="default"
 export VIR_NET_OCT=""
 
 # -c, --cluster-name NAME
-export CLUSTER_NAME="ocp4"
+export CLUSTER_NAME="ocp-01"
 
 # -d, --cluster-domain DOMAIN
 export BASE_DOM="local"
@@ -81,7 +81,7 @@ export SSH_PUB_KEY_FILE=""
 # switches everytime you run the script.
 
 # --autostart-vms
-export AUTOSTART_VMS="no"
+export AUTOSTART_VMS="yes"
 
 # -k, --keep-bootstrap
 export KEEP_BS="no"

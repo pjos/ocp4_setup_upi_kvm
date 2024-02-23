@@ -15,11 +15,11 @@ cp "${CACHE_DIR}/CentOS-7-x86_64-GenericCloud.qcow2" "${VM_DIR}/${CLUSTER_NAME}-
 
 echo "====> Setting up Loadbalancer VM: "
 virt-customize -a "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2" \
-    --uninstall cloud-init --ssh-inject root:file:${SSH_PUB_KEY_FILE} --selinux-relabel --install haproxy --install bind-utils \
+    --uninstall cloud-init --ssh-inject root:file:${SSH_PUB_KEY_FILE} --selinux-relabel --install haproxy --install nc --install bind-utils \
     --copy-in install_dir/bootstrap.ign:/opt/ --copy-in install_dir/master.ign:/opt/ --copy-in install_dir/worker.ign:/opt/ \
     --copy-in "${CACHE_DIR}/${IMAGE}":/opt/ --copy-in tmpws.service:/etc/systemd/system/ \
     --copy-in haproxy.cfg:/etc/haproxy/ \
-    --run-command "systemctl daemon-reload" --run-command "systemctl enable tmpws.service" || \
+    --run-command "systemctl daemon-reload" --run-command "systemctl enable tmpws.service" --run-command "setsebool -P haproxy_connect_any 1" || \
     err "Setting up Loadbalancer VM image ${VM_DIR}/${CLUSTER_NAME}-lb.qcow2 failed"
 
 echo -n "====> Creating Loadbalancer VM: "
