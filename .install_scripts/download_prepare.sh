@@ -59,6 +59,8 @@ mkdir install_dir
 cat <<EOF > install_dir/install-config.yaml
 apiVersion: v1
 baseDomain: ${BASE_DOM}
+additionalTrustBundle: |
+$(cat /etc/pki/ca-trust/source/anchors/Root_CA.crt | sed 's,^,  ,')
 compute:
 - hyperthreading: Disabled
   name: worker
@@ -73,13 +75,21 @@ networking:
   clusterNetworks:
   - cidr: 10.128.0.0/14
     hostPrefix: 23
-  networkType: OpenShiftSDN
+  networkType: OVNKubernetes
   serviceNetwork:
   - 172.30.0.0/16
 platform:
   none: {}
 pullSecret: '${PULL_SEC}'
 sshKey: '$(cat ${SSH_PUB_KEY_FILE})'
+imageContentSources:
+- mirrors:
+  - quay.registry:5000/ocp/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - quay.registry:5000/ocp/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
+
 EOF
 
 
