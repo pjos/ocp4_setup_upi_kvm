@@ -82,7 +82,7 @@ platform:
   none: {}
 pullSecret: '${PULL_SEC}'
 sshKey: '$(cat ${SSH_PUB_KEY_FILE})'
-imageContentSources:
+imageDigestSources:
 - mirrors:
   - quay.registry:5000/ocp/openshift/release
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
@@ -177,24 +177,24 @@ for i in $(seq 1 ${N_MAST})
 do
     echo "  server master-${i} master-${i}.${CLUSTER_NAME}.${BASE_DOM}:443 check" >> haproxy.cfg
 done
-echo "
-# 8080 points to master nodes
-frontend ${CLUSTER_NAME}-shard-http *:8080
-  default_backend ingress-shard-http
-backend ingress-shard-http
-  balance source" >> haproxy.cfg
-for i in $(seq 1 ${N_MAST})
-do
-    echo "  server master-${i} master-${i}.${CLUSTER_NAME}.${BASE_DOM}:32480 check" >> haproxy.cfg
-done
-echo "
-# 443 points to master nodes
-frontend ${CLUSTER_NAME}-shard-https *:443
-  default_backend infra-shard-https
-backend infra-shard-https
-  balance source" >> haproxy.cfg
-for i in $(seq 1 ${N_MAST})
-do
-    echo "  server master-${i} master-${i}.${CLUSTER_NAME}.${BASE_DOM}:32443 check" >> haproxy.cfg
-done
+# echo "
+# # 8080 points to master nodes
+# frontend ${CLUSTER_NAME}-shard-http *:8080
+#   default_backend ingress-shard-http
+# backend ingress-shard-http
+#   balance source" >> haproxy.cfg
+# for i in $(seq 1 ${N_MAST})
+# do
+#     echo "  server master-${i} master-${i}.${CLUSTER_NAME}.${BASE_DOM}:32480 check" >> haproxy.cfg
+# done
+# echo "
+# # 443 points to master nodes
+# frontend ${CLUSTER_NAME}-shard-https *:443
+#   default_backend infra-shard-https
+# backend infra-shard-https
+#   balance source" >> haproxy.cfg
+# for i in $(seq 1 ${N_MAST})
+# do
+#     echo "  server master-${i} master-${i}.${CLUSTER_NAME}.${BASE_DOM}:32443 check" >> haproxy.cfg
+# done
 

@@ -19,7 +19,7 @@ export N_MAST="3"
 export N_WORK="3"
 
 # --master-cpu N(vCPU)
-export MAS_CPU="4"
+export MAS_CPU="6"
 
 # --master-mem SIZE(MB)
 export MAS_MEM="16000"
