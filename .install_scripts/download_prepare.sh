@@ -84,10 +84,10 @@ pullSecret: '${PULL_SEC}'
 sshKey: '$(cat ${SSH_PUB_KEY_FILE})'
 imageDigestSources:
 - mirrors:
-  - quay.registry:5000/ocp/openshift/release
+  - quay.registry.local:5000/ocp/openshift/release
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
 - mirrors:
-  - quay.registry:5000/ocp/openshift/release-images
+  - quay.registry.local:5000/ocp/openshift/release-images
   source: quay.io/openshift-release-dev/ocp-release
 
 EOF
