@@ -7,6 +7,7 @@
 # to avoid passing them every time.
 
 # -O, --ocp-version VERSION
+export OCP_VERSION="4.14.15"
 export OCP_VERSION="stable"
 
 # -R, --rhcos-version VERSION
@@ -19,22 +20,22 @@ export N_MAST="3"
 export N_WORK="3"
 
 # --master-cpu N(vCPU)
-export MAS_CPU="6"
+export MAS_CPU="8"
 
 # --master-mem SIZE(MB)
-export MAS_MEM="16000"
+export MAS_MEM="20480"
 
 # --worker-cpu N(vCPU)
-export WOR_CPU="8"
+export WOR_CPU="6"
 
 # --worker-mem SIZE(MB)
-export WOR_MEM="16000"
+export WOR_MEM="16384"
 
 # --bootstrap-cpu N(vCPU)
 export BTS_CPU="4"
 
 # --bootstrap-mem SIZE(MB)
-export BTS_MEM="16000"
+export BTS_MEM="16384"
 
 # --lb-cpu N(vCPU)
 export LB_CPU="1"
