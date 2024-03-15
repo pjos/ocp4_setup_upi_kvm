@@ -24,7 +24,6 @@ export MAS_CPU="8"
 
 # --master-mem SIZE(MB)
 export MAS_MEM="20480"
-export MAS_MEM="16384"
 
 # --worker-cpu N(vCPU)
 export WOR_CPU="6"
@@ -51,7 +50,7 @@ export DEF_LIBVIRT_NET="default"
 export VIR_NET_OCT=""
 
 # -c, --cluster-name NAME
-export CLUSTER_NAME="ocp-01"
+export CLUSTER_NAME="ocp-02"
 
 # -d, --cluster-domain DOMAIN
 export BASE_DOM="local"
@@ -101,5 +100,5 @@ export YES="no"
 
 export OCP_MIRROR="https://mirror.openshift.com/pub/openshift-v4/clients/ocp"
 export RHCOS_MIRROR="https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos"
-export LB_IMG_URL="https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
+#export LB_IMG_URL="https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
 export LB_IMG_URL="https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"

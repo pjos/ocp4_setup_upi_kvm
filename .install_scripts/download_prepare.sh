@@ -60,7 +60,7 @@ cat <<EOF > install_dir/install-config.yaml
 apiVersion: v1
 baseDomain: ${BASE_DOM}
 additionalTrustBundle: |
-$(cat /etc/pki/ca-trust/source/anchors/Root_CA.crt | sed 's,^,  ,')
+$(cat /etc/pki/ca-trust/source/anchors/ca.crt | sed 's,^,  ,')
 compute:
 - hyperthreading: Disabled
   name: worker
@@ -104,7 +104,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/opt
-ExecStart=/usr/bin/python -m SimpleHTTPServer ${WS_PORT}
+ExecStart=/usr/bin/python -m http.server ${WS_PORT}
 [Install]
 WantedBy=default.target
 EOF
@@ -136,7 +136,8 @@ defaults
   timeout check 10s
   maxconn 3000
 # 6443 points to control plan
-frontend ${CLUSTER_NAME}-api *:6443
+frontend ${CLUSTER_NAME}-api 
+  bind *:6443
   default_backend master-api
 backend master-api
   balance source
@@ -148,7 +149,8 @@ done
 echo "
 
 # 22623 points to control plane
-frontend ${CLUSTER_NAME}-mapi *:22623
+frontend ${CLUSTER_NAME}-mapi 
+  bind *:22623
   default_backend master-mapi
 backend master-mapi
   balance source
@@ -159,7 +161,8 @@ do
 done
 echo "
 # 80 points to master nodes
-frontend ${CLUSTER_NAME}-http *:80
+frontend ${CLUSTER_NAME}-http 
+  bind *:80
   default_backend ingress-http
 backend ingress-http
   balance source" >> haproxy.cfg
@@ -169,7 +172,8 @@ do
 done
 echo "
 # 443 points to master nodes
-frontend ${CLUSTER_NAME}-https *:443
+frontend ${CLUSTER_NAME}-https 
+  bind *:443
   default_backend infra-https
 backend infra-https
   balance source" >> haproxy.cfg
