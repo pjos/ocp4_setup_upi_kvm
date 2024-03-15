@@ -10,8 +10,8 @@ echo
 echo -n "====> Downloading Centos 7 cloud image: "; download get "$LB_IMG" "$LB_IMG_URL";
 
 echo -n "====> Copying Image for Loadbalancer VM: "
-cp "${CACHE_DIR}/CentOS-7-x86_64-GenericCloud.qcow2" "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2" || \
-    err "Copying '${VM_DIR}/CentOS-7-x86_64-GenericCloud.qcow2' to '${VM_DIR}/${CLUSTER_NAME}-lb.qcow2' failed"; ok
+cp "${CACHE_DIR}/$(filename ${LB_IMG_URL})" "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2" || \
+    err "Copying '${CACHE_DIR}/$(filename ${LB_IMG_URL})' to '${VM_DIR}/${CLUSTER_NAME}-lb.qcow2' failed"; ok
 
 echo "====> Setting up Loadbalancer VM: "
 virt-customize -a "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2" \
