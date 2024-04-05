@@ -14,9 +14,9 @@ fi
 
 echo -n "====> Creating Boostrap VM: "
 virt-install --name ${CLUSTER_NAME}-bootstrap \
-  --disk "${VM_DIR}/${CLUSTER_NAME}-bootstrap.qcow2,size=50" --ram ${BTS_MEM} --cpu host --vcpus ${BTS_CPU} \
+  --disk "${VM_DIR}/${CLUSTER_NAME}-bootstrap.qcow2,size=50" --ram ${BTS_MEM} --cpu host-passthrough --vcpus ${BTS_CPU} \
   --os-variant rhel7.0 \
-  --network network=${VIR_NET},model=virtio --noreboot --noautoconsole \
+  --network bridge=bridge0,model=virtio,mac=${nodeMAC[bootstrap.${CLUSTER_NAME}]} --noreboot --noautoconsole \
   --location rhcos-install/ \
   --extra-args "nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev=vda ${RHCOS_I_ARG}=http://${LBIP}:${WS_PORT}/${IMAGE} coreos.inst.ignition_url=http://${LBIP}:${WS_PORT}/bootstrap.ign" > /dev/null || err "Creating boostrap vm failed"; ok
 
@@ -24,9 +24,9 @@ for i in $(seq 1 ${N_MAST})
 do
 echo -n "====> Creating Master-${i} VM: "
 virt-install --name ${CLUSTER_NAME}-master-${i} \
---disk "${VM_DIR}/${CLUSTER_NAME}-master-${i}.qcow2,size=50" --ram ${MAS_MEM} --cpu host --vcpus ${MAS_CPU} \
+--disk "${VM_DIR}/${CLUSTER_NAME}-master-${i}.qcow2,size=50" --ram ${MAS_MEM} --cpu host-passthrough --vcpus ${MAS_CPU} \
 --os-variant rhel7.0 \
---network network=${VIR_NET},model=virtio --noreboot --noautoconsole \
+--network bridge=bridge0,model=virtio,mac=${nodeMAC[${CLUSTER_NAME}-master-${i}]} --noreboot --noautoconsole \
 --location rhcos-install/ \
 --extra-args "nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev=vda ${RHCOS_I_ARG}=http://${LBIP}:${WS_PORT}/${IMAGE} coreos.inst.ignition_url=http://${LBIP}:${WS_PORT}/master.ign" > /dev/null || err "Creating master-${i} vm failed "; ok
 done
@@ -37,7 +37,7 @@ echo -n "====> Creating Worker-${i} VM: "
   virt-install --name ${CLUSTER_NAME}-worker-${i} \
   --disk "${VM_DIR}/${CLUSTER_NAME}-worker-${i}.qcow2,size=50" --ram ${WOR_MEM} --cpu host --vcpus ${WOR_CPU} \
   --os-variant rhel7.0 \
-  --network network=${VIR_NET},model=virtio --noreboot --noautoconsole \
+  --network bridge=bridge0,model=virtio,mac=${nodeMAC[${CLUSTER_NAME}-worker-${i}]} --noreboot --noautoconsole \
   --location rhcos-install/ \
   --extra-args "nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev=vda ${RHCOS_I_ARG}=http://${LBIP}:${WS_PORT}/${IMAGE} coreos.inst.ignition_url=http://${LBIP}:${WS_PORT}/worker.ign" > /dev/null || err "Creating worker-${i} vm failed "; ok
 done
@@ -67,34 +67,22 @@ do
 done
 
 echo -n "====> Waiting for Bootstrap to obtain IP address: "
-while true; do
-    sleep 5
-    BSIP=$(virsh domifaddr "${CLUSTER_NAME}-bootstrap" | grep ipv4 | head -n1 | awk '{print $4}' | cut -d'/' -f1 2> /dev/null)
-    test "$?" -eq "0" -a -n "$BSIP"  && { echo "$BSIP"; break; }
-done
-MAC=$(virsh domifaddr "${CLUSTER_NAME}-bootstrap" | grep ipv4 | head -n1 | awk '{print $2}')
-
-echo -n "  ==> Adding DHCP reservation: "
-virsh net-update ${VIR_NET} add-last ip-dhcp-host --xml "<host mac='$MAC' ip='$BSIP'/>" --live --config > /dev/null || \
-    err "Adding DHCP reservation failed"; ok
+BSIP=${nodeIP[bootstrap.${CLUSTER_NAME}]}
+while ! ping $BSIP -c 1 > /dev/null; do
+  sleep 1
+done 
+ok
 
 echo -n "  ==> Adding hosts entry in /etc/hosts.${CLUSTER_NAME}: "
 echo "$BSIP bootstrap.${CLUSTER_NAME}.${BASE_DOM}" >> /etc/hosts.${CLUSTER_NAME} || err "failed"; ok
 
 for i in $(seq 1 ${N_MAST}); do
     echo -n "====> Waiting for Master-$i to obtain IP address: "
-        while true
-        do
-            sleep 5
-            IP=$(virsh domifaddr "${CLUSTER_NAME}-master-${i}" | grep ipv4 | head -n1 | awk '{print $4}' | cut -d'/' -f1 2> /dev/null)
-            test "$?" -eq "0" -a -n "$IP"  && { echo "$IP"; break; }
-        done
-        MAC=$(virsh domifaddr "${CLUSTER_NAME}-master-${i}" | grep ipv4 | head -n1 | awk '{print $2}')
-
-    echo -n "  ==> Adding DHCP reservation: "
-    virsh net-update ${VIR_NET} add-last ip-dhcp-host --xml "<host mac='$MAC' ip='$IP'/>" --live --config > /dev/null || \
-    err "Adding DHCP reservation failed"; ok
-
+    IP=${nodeIP[${CLUSTER_NAME}-master-${i}]}
+    while ! ping $IP -c 1 > /dev/null; do
+        sleep 1
+    done 
+    ok
     echo -n "  ==> Adding hosts entry in /etc/hosts.${CLUSTER_NAME}: "
     echo "$IP master-${i}.${CLUSTER_NAME}.${BASE_DOM}" \
          "etcd-$((i-1)).${CLUSTER_NAME}.${BASE_DOM}" >> /etc/hosts.${CLUSTER_NAME} || err "failed"; ok
@@ -106,17 +94,11 @@ done
 
 for i in $(seq 1 ${N_WORK}); do
     echo -n "====> Waiting for Worker-$i to obtain IP address: "
-    while true
-    do
-        sleep 5
-        IP=$(virsh domifaddr "${CLUSTER_NAME}-worker-${i}" | grep ipv4 | head -n1 | awk '{print $4}' | cut -d'/' -f1 2> /dev/null)
-        test "$?" -eq "0" -a -n "$IP"  && { echo "$IP"; break; }
-    done
-    MAC=$(virsh domifaddr "${CLUSTER_NAME}-worker-${i}" | grep ipv4 | head -n1 | awk '{print $2}')
-
-    echo -n "  ==> Adding DHCP reservation: "
-    virsh net-update ${VIR_NET} add-last ip-dhcp-host --xml "<host mac='$MAC' ip='$IP'/>" --live --config > /dev/null || \
-    err "Adding DHCP reservation failed"; ok
+    IP=${nodeIP[${CLUSTER_NAME}-worker-${i}]}
+    while ! ping $IP -c 1 > /dev/null; do
+        sleep 1
+    done 
+    ok
 
     echo -n "  ==> Adding hosts entry in /etc/hosts.${CLUSTER_NAME}: "
     echo "$IP worker-${i}.${CLUSTER_NAME}.${BASE_DOM}" >> /etc/hosts.${CLUSTER_NAME} || err "failed"; ok
@@ -124,8 +106,6 @@ done
 
 echo -n '====> Adding wild-card (*.apps) dns record in dnsmasq: '
 echo "address=/apps.${CLUSTER_NAME}.${BASE_DOM}/${LBIP}" >> ${DNS_DIR}/${CLUSTER_NAME}.conf || err "failed"; ok
-echo -n '====> Adding wild-card (*.apps) dns record in dnsmasq: '
-echo "address=/apps.shard.${BASE_DOM}/${LBIP}" >> ${DNS_DIR}/${CLUSTER_NAME}.conf || err "failed"; ok
 
 echo -n "====> Resstarting libvirt and dnsmasq: "
 systemctl restart libvirtd || err "systemctl restart libvirtd failed"

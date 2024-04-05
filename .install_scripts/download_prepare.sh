@@ -89,7 +89,6 @@ imageDigestSources:
 - mirrors:
   - quay.registry.local:5000/ocp/openshift/release-images
   source: quay.io/openshift-release-dev/ocp-release
-
 EOF
 
 

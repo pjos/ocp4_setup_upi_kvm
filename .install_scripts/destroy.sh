@@ -12,28 +12,11 @@ fi
 
 for vm in $(virsh list --all --name | grep "${CLUSTER_NAME}-lb\|${CLUSTER_NAME}-master-\|${CLUSTER_NAME}-worker-\|${CLUSTER_NAME}-bootstrap"); do
     check_if_we_can_continue "Deleting VM $vm"
-    MAC=$(virsh domiflist "$vm" | grep network | awk '{print $5}')
-    DHCP_LEASE=$(virsh net-dumpxml ${VIR_NET} | grep '<host ' | grep "$MAC" | sed 's/^[ ]*//')
-    echo -n "XXXX> Deleting DHCP reservation for VM $vm: "
-        virsh net-update ${VIR_NET} delete ip-dhcp-host --xml "$DHCP_LEASE" --live --config &> /dev/null || \
-            echo -n "dhcp reservation delete failed (ignoring) ... "
-        ok
     echo -n "XXXX> Deleting VM $vm: "
         virsh destroy "$vm" &> /dev/null || echo -n "stopping vm failed (ignoring) ... "
         virsh undefine "$vm" --remove-all-storage &> /dev/null || echo -n "deleting vm failed (ignoring) ... "
         ok
 done
-
-if [ -n "$VIR_NET_OCT" ]; then
-    virnet=$(virsh net-uuid "ocp-${VIR_NET_OCT}" 2> /dev/null || true)
-    if [ -n "$virnet" ]; then
-        check_if_we_can_continue "Deleting libvirt network ocp-${VIR_NET_OCT}"
-        echo -n "XXXX> Deleting libvirt network ocp-${VIR_NET_OCT}: "
-            virsh net-destroy "ocp-${VIR_NET_OCT}" > /dev/null ||  echo -n "virsh net-destroy ocp-${VIR_NET_OCT} failed (ignoring) ... "
-            virsh net-undefine "ocp-${VIR_NET_OCT}" > /dev/null || echo -n "virsh net-undefine ocp-${VIR_NET_OCT} failed (ignoring) ... "
-        ok
-    fi
-fi
 
 if [ -d "${SETUP_DIR}" ]; then
     check_if_we_can_continue "Removing directory (rm -rf) $SETUP_DIR"

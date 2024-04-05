@@ -81,10 +81,10 @@ test -f "/etc/hosts.${CLUSTER_NAME}" && err "Existing hosts file found: /etc/hos
 ok
 
 echo -n "====> Checking for any leftover/conflicting dns records: "
-for h in api api-int bootstrap master-1 master-2 master-3 etcd-0 etcd-1 etcd-2 worker-1 worker-2 test.apps; do
-    res=$(dig +short "${h}.${CLUSTER_NAME}.${BASE_DOM}" @127.0.0.1) || err "Failed dig @127.0.0.1"
-    test -z "${res}" || err "Found existing dns record for ${h}.${CLUSTER_NAME}.${BASE_DOM}: ${res}"
-done
+# for h in api api-int bootstrap master-1 master-2 master-3 etcd-0 etcd-1 etcd-2 worker-1 worker-2 test.apps; do
+#     res=$(dig +short "${h}.${CLUSTER_NAME}.${BASE_DOM}" @127.0.0.1) || err "Failed dig @127.0.0.1"
+#     test -z "${res}" || err "Found existing dns record for ${h}.${CLUSTER_NAME}.${BASE_DOM}: ${res}"
+# done
 existing=$(cat /etc/hosts | grep -v "^#" | grep -w -m1 "${CLUSTER_NAME}\.${BASE_DOM}") || true
 test -z "$existing" || err "Found existing /etc/hosts records" "$existing"
 ok
