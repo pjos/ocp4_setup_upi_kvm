@@ -27,10 +27,10 @@ fi
 source ${SDIR}/.install_scripts/sanity_check.sh
 
 # Libvirt Network
-source ${SDIR}/.install_scripts/libvirt_network.sh
+#source ${SDIR}/.install_scripts/libvirt_network.sh
 
 # DNS Check
-source ${SDIR}/.install_scripts/dns_check.sh
+#source ${SDIR}/.install_scripts/dns_check.sh
 
 # Version check
 source ${SDIR}/.install_scripts/version_check.sh
