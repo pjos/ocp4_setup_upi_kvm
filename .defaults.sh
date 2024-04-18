@@ -7,7 +7,8 @@
 # to avoid passing them every time.
 
 # -O, --ocp-version VERSION
-export OCP_VERSION="4.14.17"
+export OCP_VERSION="4.14.18"
+export OCP_VERSION="4.15.8"
 #export OCP_VERSION="stable"
 
 # -R, --rhcos-version VERSION
@@ -30,7 +31,7 @@ export WOR_CPU="16"
 
 # --worker-mem SIZE(MB)
 export WOR_MEM="16384"
-export WOR_MEM="32768"
+#export WOR_MEM="32768"
 
 # --bootstrap-cpu N(vCPU)
 export BTS_CPU="4"
@@ -122,14 +123,14 @@ declare -A nodeIP=(
     [ocp-02-worker-2]="192.168.0.115"
     [ocp-02-worker-3]="192.168.0.116"
     [bootstrap.ocp-02]="192.168.0.149"
-    [hub-01-lb]="192.168.0.130" 
-    [hub-01-master-1]="192.168.0.131"
-    [hub-01-master-2]="192.168.0.132"
-    [hub-01-master-3]="192.168.0.133"
-    [hub-01-worker-1]="192.168.0.134"
-    [hub-01-worker-2]="192.168.0.135"
-    [hub-01-worker-3]="192.168.0.136"
-    [bootstrap.hub-01]="192.168.0.149"
+    [ocp-03-lb]="192.168.0.130" 
+    [ocp-03-master-1]="192.168.0.131"
+    [ocp-03-master-2]="192.168.0.132"
+    [ocp-03-master-3]="192.168.0.133"
+    [ocp-03-worker-1]="192.168.0.134"
+    [ocp-03-worker-2]="192.168.0.135"
+    [ocp-03-worker-3]="192.168.0.136"
+    [bootstrap.ocp-03]="192.168.0.149"
 
 )
 
@@ -150,13 +151,13 @@ declare -A nodeMAC=(
     [ocp-02-worker-2]="52:54:55:56:02:05"
     [ocp-02-worker-3]="52:54:55:56:02:06"
     [bootstrap.ocp-02]="52:54:55:56:01:49"
-    [hub-01-lb]="52:54:55:56:03:00" 
-    [hub-01-master-1]="52:54:55:56:03:01"
-    [hub-01-master-2]="52:54:55:56:03:02"
-    [hub-01-master-3]="52:54:55:56:03:03"
-    [hub-01-worker-1]="52:54:55:56:03:04"
-    [hub-01-worker-2]="52:54:55:56:03:05"
-    [hub-01-worker-3]="52:54:55:56:03:06"
-    [bootstrap.hub-01]="52:54:55:56:03:49"
+    [ocp-03-lb]="52:54:55:56:03:00" 
+    [ocp-03-master-1]="52:54:55:56:03:01"
+    [ocp-03-master-2]="52:54:55:56:03:02"
+    [ocp-03-master-3]="52:54:55:56:03:03"
+    [ocp-03-worker-1]="52:54:55:56:03:04"
+    [ocp-03-worker-2]="52:54:55:56:03:05"
+    [ocp-03-worker-3]="52:54:55:56:03:06"
+    [bootstrap.ocp-03]="52:54:55:56:03:49"
 )
 

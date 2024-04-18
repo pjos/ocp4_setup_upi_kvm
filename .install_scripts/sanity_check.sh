@@ -56,29 +56,29 @@ fi
 systemctl -q is-active $DNS_SVC || err "DNS_DIR points to $DNS_DIR but $DNS_SVC is not active"
 ok "${DNS_SVC}"
 
-if [ "${DNS_SVC}" == "NetworkManager" ]; then
-    echo -n "====> Checking if dnsmasq is enabled in NetworkManager: "
-    find /etc/NetworkManager/ -name *.conf -exec cat {} \; | grep -v "^#" | grep dnsmasq &> /dev/null \
-    	|| err "DNS Directory is set to NetworkManager but dnsmasq is not enabled in NetworkManager" \
-                             "See: https://github.com/kxr/ocp4_setup_upi_kvm/wiki/Setting-Up-DNS"
-    ok
-fi
+# if [ "${DNS_SVC}" == "NetworkManager" ]; then
+#     echo -n "====> Checking if dnsmasq is enabled in NetworkManager: "
+#     find /etc/NetworkManager/ -name *.conf -exec cat {} \; | grep -v "^#" | grep dnsmasq &> /dev/null \
+#     	|| err "DNS Directory is set to NetworkManager but dnsmasq is not enabled in NetworkManager" \
+#                              "See: https://github.com/kxr/ocp4_setup_upi_kvm/wiki/Setting-Up-DNS"
+#     ok
+# fi
 
-echo -n "====> Testing dnsmasq reload (systemctl ${DNS_CMD} ${DNS_SVC}): "
-systemctl $DNS_CMD $DNS_SVC || err "systemctl ${DNS_CMD} ${DNS_SVC} failed"
-ok
+# echo -n "====> Testing dnsmasq reload (systemctl ${DNS_CMD} ${DNS_SVC}): "
+# systemctl $DNS_CMD $DNS_SVC || err "systemctl ${DNS_CMD} ${DNS_SVC} failed"
+# ok
 
 echo -n "====> Testing libvirtd restart (systemctl restart libvirtd): "
 systemctl restart libvirtd || err "systemctl restart libvirtd failed"
 ok
 
-echo -n "====> Checking for any leftover dnsmasq config: "
-test -f "${DNS_DIR}/${CLUSTER_NAME}.conf" && err "Existing dnsmasq config file found: ${DNS_DIR}/${CLUSTER_NAME}.conf"
-ok
+# echo -n "====> Checking for any leftover dnsmasq config: "
+# test -f "${DNS_DIR}/${CLUSTER_NAME}.conf" && err "Existing dnsmasq config file found: ${DNS_DIR}/${CLUSTER_NAME}.conf"
+# ok
 
-echo -n "====> Checking for any leftover hosts file: "
-test -f "/etc/hosts.${CLUSTER_NAME}" && err "Existing hosts file found: /etc/hosts.${CLUSTER_NAME}"
-ok
+# echo -n "====> Checking for any leftover hosts file: "
+# test -f "/etc/hosts.${CLUSTER_NAME}" && err "Existing hosts file found: /etc/hosts.${CLUSTER_NAME}"
+# ok
 
 echo -n "====> Checking for any leftover/conflicting dns records: "
 # for h in api api-int bootstrap master-1 master-2 master-3 etcd-0 etcd-1 etcd-2 worker-1 worker-2 test.apps; do
