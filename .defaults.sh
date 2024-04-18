@@ -18,7 +18,7 @@ export RHCOS_VERSION=""
 export N_MAST="3"
 
 # -w, --workers N
-export N_WORK="0"
+export N_WORK="3"
 
 # --master-cpu N(vCPU)
 export MAS_CPU="16"
@@ -29,7 +29,7 @@ export MAS_MEM="24676"
 export MAS_MEM="49152"
 
 # --worker-cpu N(vCPU)
-export WOR_CPU="16"
+export WOR_CPU="8"
 
 # --worker-mem SIZE(MB)
 export WOR_MEM="16384"
