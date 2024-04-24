@@ -62,7 +62,7 @@ baseDomain: ${BASE_DOM}
 additionalTrustBundle: |
 $(cat /etc/pki/ca-trust/source/anchors/ca.crt | sed 's,^,  ,')
 compute:
-- hyperthreading: Disabled
+- hyperthreading: Enabled
   name: worker
   replicas: 0
 controlPlane:
