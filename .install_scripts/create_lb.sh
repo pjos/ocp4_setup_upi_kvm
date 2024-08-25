@@ -7,7 +7,7 @@ echo "#################################"
 echo
 
 
-echo -n "====> Downloading Centos 7 cloud image: "; download get "$LB_IMG" "$LB_IMG_URL";
+echo -n "====> Downloading cloud image: "; download get "$LB_IMG" "$LB_IMG_URL";
 
 echo -n "====> Copying Image for Loadbalancer VM: "
 cp "${CACHE_DIR}/$(filename ${LB_IMG_URL})" "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2" || \
@@ -15,7 +15,8 @@ cp "${CACHE_DIR}/$(filename ${LB_IMG_URL})" "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2"
 
 echo "====> Setting up Loadbalancer VM: "
 virt-customize -a "${VM_DIR}/${CLUSTER_NAME}-lb.qcow2" \
-    --uninstall cloud-init --ssh-inject root:file:${SSH_PUB_KEY_FILE} --selinux-relabel --install haproxy --install nc --install bind-utils \
+    --run-command "dnf clean all && rm -r /var/cache/dnf" \
+    --update --uninstall cloud-init --ssh-inject root:file:${SSH_PUB_KEY_FILE} --selinux-relabel --install haproxy --install nc --install bind-utils \
     --copy-in install_dir/bootstrap.ign:/opt/ --copy-in install_dir/master.ign:/opt/ --copy-in install_dir/worker.ign:/opt/ \
     --copy-in "${CACHE_DIR}/${IMAGE}":/opt/ --copy-in tmpws.service:/etc/systemd/system/ \
     --copy-in haproxy.cfg:/etc/haproxy/ --root-password password:root \

@@ -8,28 +8,30 @@
 
 # -O, --ocp-version VERSION
 export OCP_VERSION="4.14.18"
-export OCP_VERSION="4.15.8"
+export OCP_VERSION="4.15.17"
+export OCP_VERSION="4.16.8"
 #export OCP_VERSION="stable"
 
 # -R, --rhcos-version VERSION
 export RHCOS_VERSION=""
 
 # -m, --masters N
-export N_MAST="3"
+export N_MAST="1"
 
 # -w, --workers N
-export N_WORK="3"
+export N_WORK="0"
 
 # --master-cpu N(vCPU)
-export MAS_CPU="16"
+export MAS_CPU="32"
 
 # --master-mem SIZE(MB)
 export MAS_MEM="32678"
-export MAS_MEM="24676"
-export MAS_MEM="49152"
+#export MAS_MEM="24676"
+#export MAS_MEM="49152"
+export MAS_MEM="65536"
 
 # --worker-cpu N(vCPU)
-export WOR_CPU="8"
+export WOR_CPU="16"
 
 # --worker-mem SIZE(MB)
 export WOR_MEM="16384"
@@ -107,6 +109,7 @@ export OCP_MIRROR="https://mirror.openshift.com/pub/openshift-v4/clients/ocp"
 export RHCOS_MIRROR="https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos"
 #export LB_IMG_URL="https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
 export LB_IMG_URL="https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+#export LB_IMG_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2"
 
 
 declare -A nodeIP=(
